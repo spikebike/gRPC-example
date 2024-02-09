@@ -15,6 +15,7 @@ type server struct {
 
 func (s *server) SendBytes(ctx context.Context, in *pb.ByteArrayRequest) (*pb.ByteArrayResponse, error) {
 	log.Printf("Received request")
+	log.Printf("Byte array: %v\n", in.Data)
 	// logic to handle and respond to the byte array
 	res := &pb.ByteArrayResponse{Data: in.Data}
 	return res, nil

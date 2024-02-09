@@ -2,15 +2,17 @@ syntax = "proto3";
 
 option go_package = "github.com/spikebike/gRPC-example/matrix";
 
-message Matrix {
-    repeated bytes rows = 1; 
+package main;
+
+service ByteTransferService {
+  rpc SendBytes (ByteArrayRequest) returns (ByteArrayResponse) {}
 }
 
-service DataExchange {
-    rpc SendMatrix (Matrix) returns (Status) {} 
+message ByteArrayRequest {
+  repeated bytes data = 1;
 }
 
-message Status {
-    string message = 1;
+message ByteArrayResponse {
+  repeated bytes data = 1;
 }
 

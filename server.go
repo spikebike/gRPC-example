@@ -1,35 +1,34 @@
 package main
 
 import (
-    "context"
-    "fmt"
-    "log"
-    "net"
+	"context"
+	"log"
+	"net"
 
-	"github.com/spikebike/gRPC-example/matrix"
 	"google.golang.org/grpc"
+	pb "github.com/spikebike/gRPC-example/matrix"
 )
 
-type dataExchangeServer struct {
-    matrix.UnimplementedDataExchangeServer 
+type server struct {
+	pb.UnimplementedByteTransferServiceServer
 }
 
-func (s *dataExchangeServer) SendMatrix(ctx context.Context, matrix *matrix.Matrix) (*matrix.Status, error) {
-    // Process received [][]byte (matrix.Rows)
-    fmt.Println("Received matrix data:", matrix.Rows)
-
-    // ... (Handle sending data to relevant peers based on your P2P logic)
-
-    return &matrix.Status{Message: "Success"}, nil 
+func (s *server) SendBytes(ctx context.Context, in *pb.ByteArrayRequest) (*pb.ByteArrayResponse, error) {
+	log.Printf("Received request")
+	// logic to handle and respond to the byte array
+	res := &pb.ByteArrayResponse{Data: in.Data}
+	return res, nil
 }
 
 func main() {
-    // ... Set up gRPC server (configure your listener, etc.)
-    lis, err := net.Listen("tcp", ":8080") 
-    // ... Error handling
+	listen, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
 
-    grpcServer := grpc.NewServer()
-    matrix.RegisterDataExchangeServer(grpcServer, &dataExchangeServer{}) 
-    grpcServer.Serve(lis)
+	s := grpc.NewServer()
+	pb.RegisterByteTransferServiceServer(s, &server{})
+	if err := s.Serve(listen); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
+	}
 }
-
